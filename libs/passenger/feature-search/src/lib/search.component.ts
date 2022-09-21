@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Passenger, SearchFacade } from '@flight-workspace/passenger/domain';
+import { AuthLibService } from '@flight-workspace/shared/auth-lib';
 
 @Component({
   selector: 'passenger-search',
@@ -8,11 +9,17 @@ import { Passenger, SearchFacade } from '@flight-workspace/passenger/domain';
 })
 export class SearchComponent {
   firstname = '';
+
   name = 'Smith';
+
   passengerList$ = this.searchFacade.passengerList$;
+
   selectedPassenger: Passenger | undefined;
 
-  constructor(private searchFacade: SearchFacade) {}
+  user = this.authService.user
+
+  constructor(private searchFacade: SearchFacade,
+              private authService: AuthLibService) {}
 
   load(): void {
     this.searchFacade.load(this.name, this.firstname);
