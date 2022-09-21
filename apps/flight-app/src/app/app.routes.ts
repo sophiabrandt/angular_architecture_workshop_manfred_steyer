@@ -1,3 +1,4 @@
+import { loadRemoteModule } from '@angular-architects/module-federation';
 import { Routes } from '@angular/router';
 import { BasketComponent } from './basket/basket.component';
 import { HomeComponent } from './home/home.component';
@@ -11,6 +12,16 @@ export const APP_ROUTES: Routes = [
   {
     path: 'home',
     component: HomeComponent
+  },
+  {
+    path: 'passenger-mf',
+    loadChildren: () => 
+      loadRemoteModule({
+        type: 'manifest',
+        remoteName: 'passenger',
+        exposedModule: './Module'
+      }) 
+        .then(esm => esm.PassengerModule)
   },
   {
     path: 'basket',
