@@ -46,6 +46,8 @@
     "@swc/helpers": "~0.3.3",
     "@swimlane/ngx-charts": "^20.1.0",
     "angular-oauth2-oidc": "^13.0.1",
+    "immer": "^9.0.15",
+    "ngrx-immer": "^2.0.1",
     "nx": "^14.1.4",
     "rxjs": "~7.5.0",
     "tslib": "^2.0.0",

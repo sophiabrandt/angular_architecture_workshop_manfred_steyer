@@ -1,5 +1,9 @@
-import {Component, OnInit} from '@angular/core';
-import {FlightService} from '@flight-workspace/flight-lib';
+import { Component, OnInit } from '@angular/core';
+import { FlightService } from '@flight-workspace/flight-lib';
+import { Store } from '@ngrx/store';
+import { take } from 'rxjs';
+import * as FlightBookingActions from '../+state/flight-booking.actions';
+import { FlightBookingAppState } from '../+state/flight-booking.reducer';
 
 @Component({
   selector: 'flight-search',
@@ -12,6 +16,8 @@ export class FlightSearchComponent implements OnInit {
   to = 'Graz'; // in Austria
   urgent = false;
 
+  flights$ = this.store.select(s => s.flightBooking.flights);
+
   get flights() {
     return this.flightService.flights;
   }
@@ -23,6 +29,7 @@ export class FlightSearchComponent implements OnInit {
   };
 
   constructor(
+    private store: Store<FlightBookingAppState>,
     private flightService: FlightService) {
   }
 
@@ -31,14 +38,33 @@ export class FlightSearchComponent implements OnInit {
   }
 
   search(): void {
-    if (!this.from || !this.to) return;
+    if (!this.from || !this.to) {
+      return;
+    }
 
     this.flightService
-      .load(this.from, this.to, this.urgent);
+      .find(this.from, this.to, this.urgent)
+      .subscribe({
+        next: flights => {
+          this.store.dispatch(FlightBookingActions.loadFlightBookings({ flights }));
+        },
+        error: error => {
+          console.error('error', error);
+        }
+      });
+
   }
 
   delay(): void {
-    this.flightService.delay();
+    this.flights$.pipe(take(1)).subscribe(flights => {
+      const flight = flights[0];
+
+      const oldDate = new Date(flight.date);
+      const delayedDate = new Date(oldDate.getTime() + 15 * 60 * 1000);
+      const newFlight = { ...flight, date: delayedDate.toISOString() };
+
+      this.store.dispatch(FlightBookingActions.updateFlightBooking({ flight: newFlight }));
+    });
   }
 
 }
