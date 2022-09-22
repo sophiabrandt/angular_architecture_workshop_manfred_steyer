@@ -1,5 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {FlightService} from '@flight-workspace/flight-lib';
+import { Store } from '@ngrx/store';
+import { flightsLoaded, loadFlights } from '../+state/flight-booking.actions';
+import { FlightBookingAppStateSlice, flightBookingFeatureKey } from '../+state/flight-booking.reducer';
+import { selectFilteredFlights, selectFilteredFlightsWithParams, selectFlights, selectFlights2 } from '../+state/flight-booking.selectors';
 
 @Component({
   selector: 'flight-search',
@@ -12,6 +16,8 @@ export class FlightSearchComponent implements OnInit {
   to = 'Graz'; // in Austria
   urgent = false;
 
+  flights$ = this.store.select(selectFilteredFlightsWithParams([5]));
+
   get flights() {
     return this.flightService.flights;
   }
@@ -23,6 +29,7 @@ export class FlightSearchComponent implements OnInit {
   };
 
   constructor(
+    private store: Store<FlightBookingAppStateSlice>,
     private flightService: FlightService) {
   }
 
@@ -33,8 +40,11 @@ export class FlightSearchComponent implements OnInit {
   search(): void {
     if (!this.from || !this.to) return;
 
-    this.flightService
-      .load(this.from, this.to, this.urgent);
+    this.store.dispatch(loadFlights({
+      from: this.from,
+      to: this.to,
+      urgent: this.urgent
+    }));
   }
 
   delay(): void {
